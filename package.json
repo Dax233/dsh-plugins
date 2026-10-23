@@ -1,0 +1,22 @@
+{
+  "name": "dsh-plugins",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Index of DeepSeek Harness plugins: outbound proxy, desktop notifications, sidebar Agent Browser and real-Chrome bridge.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dax233/dsh-plugins.git"
+  },
+  "homepage": "https://github.com/Dax233/dsh-plugins#readme",
+  "bugs": {
+    "url": "https://github.com/Dax233/dsh-plugins/issues"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "plugin-directory",
+    "browser-automation"
+  ]
+}

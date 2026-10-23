@@ -1,0 +1,16 @@
+# OS / editor junk
+Thumbs.db
+desktop.ini
+.DS_Store
+*.log
+*.tmp
+
+# local runtime leftovers
+node_modules/
+
+# project memory (local working notes)
+memory/
+
+# secrets and signing keys never belong in the index
+*.pem
+.env
