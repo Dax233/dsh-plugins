@@ -10,6 +10,7 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 | [Desktop Notify](https://github.com/Dax233/dsh-desktop-notify) | Windows 原生通知：任务完成 / 需要提问 / 出错时弹 toast 并播放内置 ciallo 提示音 | `dsh plugin --profile desktop add github:Dax233/dsh-desktop-notify` |
 | [Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control) | 侧边栏 Agent 浏览器：快照 / 点击 / 输入 / 滚动 / 截图，页面内虚拟光标不碰真实鼠标 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control` |
 | [Chrome Bridge](https://github.com/Dax233/dsh-chrome-bridge) | 控制真实 Chrome：后台标签、DSH Agent 标签组 ACL、UIA refs、动作回执、console/network 日志、iframe 观测与点击 | `dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge` |
+| [Codex Bridge](https://github.com/Dax233/dsh-codex-bridge) | 桥接本机 Codex：线程清单 / 转录取读 / 无头投递任务 / goal 与活性监测（可对停滞线程补"继续"） | `dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge` |
 
 ## 安装
 
@@ -20,6 +21,7 @@ dsh plugin --profile desktop add github:Dax233/dsh-outbound-proxy
 dsh plugin --profile desktop add github:Dax233/dsh-desktop-notify
 dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control
 dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge
+dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge
 ```
 
 也可以直接在插件页添加对应 GitHub 地址；安装后重启 DSH Desktop。
@@ -36,6 +38,12 @@ dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge
 3. 打开扩展选项页，确认端口（默认 `47835`）与 token（默认 `dsh-chrome-bridge-local`）。
 
 只有 **DSH Agent 标签组** 内的标签页可以被驱动；`newTab` 会自动入组，`attach` 是显式授权（把标签页拖出组即撤销）。
+
+### Codex Bridge 说明
+
+需要本机已安装并登录 Codex（桌面版自带 CLI，或 `npm i -g @openai/codex`；登录态在 `CODEX_HOME` 下的 `auth.json`）。
+
+插件只**读** Codex home（转录、goal 数据库、写者锁、automation 文件），不修改 Codex 会话、goal 或配置；驱动 turn 走 `codex exec` / `codex exec resume` 子进程，子进程不继承凭据类环境变量。无头执行没有人工审批通道，默认 `approval_policy=never`；`codex_liveness` 的自动补活默认关闭，需要配置 `allowNudge: true` 才生效。
 
 ## 安全说明
 
