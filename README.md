@@ -13,6 +13,7 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 | [Codex Bridge](https://github.com/Dax233/dsh-codex-bridge) | 桥接本机 Codex：线程清单 / 转录取读 / 无头投递任务 / goal 与活性监测（可对停滞线程补"继续"）；仓库另带离线 watch 告警脚本 | `dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge` |
 | [Delete Guard](https://github.com/Dax233/dsh-delete-guard) | 删除指令守卫：shell 命令里出现删除动词时，必须是唯一且顶层的单条语句；串联、管道、嵌套、`cmd /c`、`iex` 一律在执行前拒绝 | `dsh plugin --profile desktop add github:Dax233/dsh-delete-guard` |
 | [Provider Aliases](https://github.com/Dax233/dsh-provider-aliases) | 模型目录别名：一个内置 provider 目录挂多条凭据路由（多 OpenCode Go 套餐等），附「模型别名」设置面板，每条路由独立 Key 与思维档位 | `dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases` |
+| [Session Bridge (fork)](https://github.com/Dax233/dsh-session-bridge) | 跨工作区会话桥 fork（上游 MIT）：按标题/工作区查找、读取任意会话，新增 `session_search_global` 全库正文检索；默认只注册只读工具，bundle patch 开启持久化全文索引 | `dsh plugin --profile desktop add github:Dax233/dsh-session-bridge` |
 
 ## 安装
 
@@ -26,6 +27,7 @@ dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge
 dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge
 dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases
 dsh plugin --profile desktop add github:Dax233/dsh-delete-guard
+dsh plugin --profile desktop add github:Dax233/dsh-session-bridge
 ```
 
 也可以直接在插件页添加对应 GitHub 地址；安装后重启 DSH Desktop。
@@ -83,6 +85,7 @@ dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases
 
 - `research/browser-control-survey.md`：同类浏览器控制方案调研。
 - `research/browser-control-backlog.md`：下载、随机配对 token、逐 frame target 等未做项。
+- `research/cross-workspace-session-access.md`：跨工作区会话访问调研、上游 fork 决策与全文索引落地记录。
 
 ## 开发
 
