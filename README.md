@@ -10,7 +10,7 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 | [Desktop Notify](https://github.com/Dax233/dsh-desktop-notify) | Windows 原生通知：任务完成 / 需要提问 / 出错时弹 toast 并播放内置 ciallo 提示音 | `dsh plugin --profile desktop add github:Dax233/dsh-desktop-notify` |
 | [Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control) | 侧边栏 Agent 浏览器：快照 / 点击 / 输入 / 滚动 / 截图，页面内虚拟光标不碰真实鼠标 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control` |
 | [Chrome Bridge](https://github.com/Dax233/dsh-chrome-bridge) | 控制真实 Chrome：后台标签、DSH Agent 标签组 ACL、UIA refs、动作回执、console/network 日志、iframe 观测与点击 | `dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge` |
-| [Codex Bridge](https://github.com/Dax233/dsh-codex-bridge) | 桥接本机 Codex：线程清单 / 转录取读 / 无头投递任务 / goal 与活性监测（可对停滞线程补"继续"） | `dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge` |
+| [Codex Bridge](https://github.com/Dax233/dsh-codex-bridge) | 桥接本机 Codex：线程清单 / 转录取读 / 无头投递任务 / goal 与活性监测（可对停滞线程补"继续"）；仓库另带离线 watch 告警脚本 | `dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge` |
 | [Delete Guard](https://github.com/Dax233/dsh-delete-guard) | 删除指令守卫：shell 命令里出现删除动词时，必须是唯一且顶层的单条语句；串联、管道、嵌套、`cmd /c`、`iex` 一律在执行前拒绝 | `dsh plugin --profile desktop add github:Dax233/dsh-delete-guard` |
 | [Provider Aliases](https://github.com/Dax233/dsh-provider-aliases) | 模型目录别名：一个内置 provider 目录挂多条凭据路由（多 OpenCode Go 套餐等），附「模型别名」设置面板，每条路由独立 Key 与思维档位 | `dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases` |
 
@@ -48,6 +48,8 @@ dsh plugin --profile desktop add github:Dax233/dsh-delete-guard
 需要本机已安装并登录 Codex（桌面版自带 CLI，或 `npm i -g @openai/codex`；登录态在 `CODEX_HOME` 下的 `auth.json`）。
 
 插件只**读** Codex home（转录、goal 数据库、写者锁、automation 文件），不修改 Codex 会话、goal 或配置；驱动 turn 走 `codex exec` / `codex exec resume` 子进程，子进程不继承凭据类环境变量。无头执行没有人工审批通道，默认 `approval_policy=never`；`codex_liveness` 的自动补活默认关闭，需要配置 `allowNudge: true` 才生效。
+
+仓库另带 `scripts/watch.mjs`：确定性的 relay 异常检查（rollout heartbeat / goals / automation / liveness），只输出告警，退出码 `0` 无告警 / `10` 有告警 / `2` 检查失败。它不持有定时器、不唤醒 DSH，需用 `--thread` 或 `watch.config.json` 指定线程（无内置默认值），再配合 DSH `schedule_create` 或任务计划实现"异常才介入"。
 
 ### Delete Guard 说明
 
