@@ -11,6 +11,10 @@ node_modules/
 # project memory (local working notes)
 memory/
 
+# local machine tooling kept outside the index (a scheduled task points at
+# tools/clash-sync/run-hidden.vbs, so the directory stays where it is)
+tools/
+
 # secrets and signing keys never belong in the index
 *.pem
 .env
