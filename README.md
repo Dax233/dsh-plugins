@@ -11,7 +11,7 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 | [Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control) | 侧边栏 Agent 浏览器：快照 / 点击 / 输入 / 滚动 / 截图，页面内虚拟光标不碰真实鼠标 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control` |
 | [Chrome Bridge](https://github.com/Dax233/dsh-chrome-bridge) | 控制真实 Chrome：后台标签、DSH Agent 标签组 ACL、UIA refs、动作回执、console/network 日志、iframe 观测与点击 | `dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge` |
 | [Codex Bridge](https://github.com/Dax233/dsh-codex-bridge) | 桥接本机 Codex：线程清单 / 转录取读 / 无头投递任务 / goal 与活性监测（可对停滞线程补"继续"） | `dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge` |
-| [Provider Aliases](https://github.com/Dax233/dsh-provider-aliases) | 设置页「模型别名」：为一个内置模型目录创建任意数量的凭据路由（多 OpenCode Go 套餐等），每条路由独立 Key、独立思维档位 | `dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases` |
+| [Provider Aliases](https://github.com/Dax233/dsh-provider-aliases) | 模型目录别名：一个内置 provider 目录挂多条凭据路由（多 OpenCode Go 套餐等），附「模型别名」设置面板，每条路由独立 Key 与思维档位 | `dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases` |
 
 ## 安装
 
@@ -49,21 +49,15 @@ dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases
 
 ### Provider Aliases 说明
 
-「模型别名」面板写入的 `catalog` 字段需要具备别名能力的 pi-ai 适配器；先安装配套覆盖包，再安装 UI 插件：
+一个包同时提供两半：同名扩展的内置 `@deepseek-ai/dsh-llm-pi-ai` 适配器（新增
+`catalog` 别名能力）与「设置 → 模型别名」面板。安装后**重启 DSH Desktop**：
 
 ```sh
-dsh plugin --profile desktop add github:Dax233/dsh-llm-pi-ai-multi
 dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases
 ```
 
-覆盖包与 DSH 版本绑定（当前对应 0.2.1-rc.3），DSH 升级后需要同步更新覆盖包；
-未安装覆盖包时面板会提示无法创建别名。
-
-## 相关包
-
-| 包 | 说明 | 安装 |
-| --- | --- | --- |
-| [dsh-llm-pi-ai-multi](https://github.com/Dax233/dsh-llm-pi-ai-multi) | 给 pi-ai 适配器增加 `catalog` 别名能力的同名覆盖包，Provider Aliases 的前置 | `dsh plugin --profile desktop add github:Dax233/dsh-llm-pi-ai-multi` |
+它覆盖的适配器编译自 DSH 0.2.1-rc.3；DSH 升级后需要等待仓库更新或按仓库 README
+重跑 `tools/sync.mjs` 重新生成。
 
 ## 安全说明
 
