@@ -11,6 +11,7 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 | [Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control) | 侧边栏 Agent 浏览器：快照 / 点击 / 输入 / 滚动 / 截图，页面内虚拟光标不碰真实鼠标 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control` |
 | [Chrome Bridge](https://github.com/Dax233/dsh-chrome-bridge) | 控制真实 Chrome：后台标签、DSH Agent 标签组 ACL、UIA refs、动作回执、console/network 日志、iframe 观测与点击 | `dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge` |
 | [Codex Bridge](https://github.com/Dax233/dsh-codex-bridge) | 桥接本机 Codex：线程清单 / 转录取读 / 无头投递任务 / goal 与活性监测（可对停滞线程补"继续"） | `dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge` |
+| [Delete Guard](https://github.com/Dax233/dsh-delete-guard) | 删除指令守卫：shell 命令里出现删除动词时，必须是唯一且顶层的单条语句；串联、管道、嵌套、`cmd /c`、`iex` 一律在执行前拒绝 | `dsh plugin --profile desktop add github:Dax233/dsh-delete-guard` |
 | [Provider Aliases](https://github.com/Dax233/dsh-provider-aliases) | 模型目录别名：一个内置 provider 目录挂多条凭据路由（多 OpenCode Go 套餐等），附「模型别名」设置面板，每条路由独立 Key 与思维档位 | `dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases` |
 
 ## 安装
@@ -24,6 +25,7 @@ dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control
 dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge
 dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge
 dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases
+dsh plugin --profile desktop add github:Dax233/dsh-delete-guard
 ```
 
 也可以直接在插件页添加对应 GitHub 地址；安装后重启 DSH Desktop。
@@ -46,6 +48,15 @@ dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases
 需要本机已安装并登录 Codex（桌面版自带 CLI，或 `npm i -g @openai/codex`；登录态在 `CODEX_HOME` 下的 `auth.json`）。
 
 插件只**读** Codex home（转录、goal 数据库、写者锁、automation 文件），不修改 Codex 会话、goal 或配置；驱动 turn 走 `codex exec` / `codex exec resume` 子进程，子进程不继承凭据类环境变量。无头执行没有人工审批通道，默认 `approval_policy=never`；`codex_liveness` 的自动补活默认关闭，需要配置 `allowNudge: true` 才生效。
+
+### Delete Guard 说明
+
+插件挂在 `tools/pre-execute` 上：命令中出现删除动词（`Remove-Item`、`rm`、`del`、`rd`、
+`[IO.File]::Delete` 等）时，只有**唯一且顶层的一条语句**才放行，其余组合在调用前被拒绝并返回原因。
+
+- 引号内字面量先掩码，路径里的 `a;b` 不会被误判成串联；但 `iex "..."` 这类会求值的场景会回查原文。
+- 分析异常时 fail-open（放行），守卫自身出问题不会把会话卡死。
+- 只管 shell 工具；`run_code` 里直接调 `fs.rmSync` 不经过 shell，不在范围内。
 
 ### Provider Aliases 说明
 
