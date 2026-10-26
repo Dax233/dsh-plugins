@@ -131,6 +131,20 @@ cd dsh-<plugin>
 npm test
 ```
 
+### 本机 profile 更换本地插件版本
+
+桌面 profile 里的 `@local` 插件是 `file:` **复制安装**（不是软链）：改了仓库文件不会自动进安装副本，
+同路径重跑 `dsh plugin add file:F:/github/<repo>` 只会输出 `Already up to date`。刷新方式：
+
+```powershell
+$dsh = 'G:\programs\DSH\resources\runtime\cli\bin\dsh.cmd'
+& $dsh plugin --profile desktop remove @local/<pkg>
+& $dsh plugin --profile desktop add file:F:/github/<repo>
+# 然后重启 DSH Desktop；Host 插件与 client bundle 都只在启动时加载
+```
+
+`file:` 依赖的「内容变了但路径没变」不会触发 pnpm 重装，这是它按目录路径标识包的行为，不是插件问题。
+
 ## License
 
 MIT
