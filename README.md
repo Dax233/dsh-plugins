@@ -14,6 +14,7 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 | [Delete Guard](https://github.com/Dax233/dsh-delete-guard) | 删除指令守卫：shell 命令里出现删除动词时，必须是唯一且顶层的单条语句；串联、管道、嵌套、`cmd /c`、`iex` 一律在执行前拒绝 | `dsh plugin --profile desktop add github:Dax233/dsh-delete-guard` |
 | [Provider Aliases](https://github.com/Dax233/dsh-provider-aliases) | 模型目录别名：一个内置 provider 目录挂多条凭据路由（多 OpenCode Go 套餐等），附「模型别名」设置面板，每条路由独立 Key 与思维档位 | `dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases` |
 | [Session Bridge (fork)](https://github.com/Dax233/dsh-session-bridge) | 跨工作区会话桥 fork（上游 MIT）：按标题/工作区查找、读取任意会话，新增 `session_search_global` 全库正文检索；工具面可切换（当前开放建会话/发消息/监控/归档等写操作），bundle patch 开启持久化全文索引 | `dsh plugin --profile desktop add github:Dax233/dsh-session-bridge` |
+| [Preset Hotswitch](https://github.com/Dax233/dsh-preset-hotswitch) | 会话内热切换 Agent 预设：绕过官方「仅空白会话可切换」限制（`agentPresets.recompose` + `agent-preset/selected`），下一请求生效、重启保持 | `dsh plugin --profile desktop add github:Dax233/dsh-preset-hotswitch` |
 
 ## 安装
 
@@ -28,6 +29,7 @@ dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge
 dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases
 dsh plugin --profile desktop add github:Dax233/dsh-delete-guard
 dsh plugin --profile desktop add github:Dax233/dsh-session-bridge
+dsh plugin --profile desktop add github:Dax233/dsh-preset-hotswitch
 ```
 
 也可以直接在插件页添加对应 GitHub 地址；安装后重启 DSH Desktop。
@@ -73,6 +75,15 @@ dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases
 
 它覆盖的适配器编译自 DSH 0.2.1-rc.3；DSH 升级后需要等待仓库更新或按仓库 README
 重跑 `tools/sync.mjs` 重新生成。
+
+### Preset Hotswitch 说明
+
+插件注册一个 Host 工具 `switch_session_preset`：官方切换入口只允许**空白会话**使用，
+已开始的会话会被 registry 以 `agent-preset/locked` 拒绝；本插件改走公开的
+`agentPresets.recompose()` 并写入 `agent-preset/selected` 事件，下一请求生效、重启后保持。
+只作用于**调用该工具的会话**，不创建/删除预设；依赖宿主的 `agentPresets` 服务。
+`recompose` 的契约自述"由调用方负责空白检查"，本插件刻意跳过该检查，属**实验性**用法，
+DSH 升级后可能失效。
 
 ## 安全说明
 

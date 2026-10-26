@@ -2,7 +2,7 @@
   "name": "dsh-plugins",
   "version": "2.0.0",
   "private": true,
-  "description": "Index of DeepSeek Harness plugins: outbound proxy, desktop notifications, sidebar Agent Browser, real-Chrome bridge, Codex bridge and model provider aliases.",
+  "description": "Index of DeepSeek Harness plugins: outbound proxy, desktop notifications, browser and Chrome control, Codex bridge, delete guard, provider aliases, session bridge and preset hot-switch.",
   "license": "MIT",
   "repository": {
     "type": "git",
