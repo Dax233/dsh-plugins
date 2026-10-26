@@ -8,10 +8,10 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 | --- | --- | --- |
 | [Outbound Proxy](https://github.com/Dax233/dsh-outbound-proxy) | 让 DSH 出站 HTTP(S) 走本机代理（Clash / mihomo 等），端口跟随启动环境，插件行可单独覆盖 | `dsh plugin --profile desktop add github:Dax233/dsh-outbound-proxy` |
 | [Desktop Notify](https://github.com/Dax233/dsh-desktop-notify) | Windows 原生通知：任务完成 / 需要提问 / 出错时弹 toast 并播放内置 ciallo 提示音 | `dsh plugin --profile desktop add github:Dax233/dsh-desktop-notify` |
-| [Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control) | 侧边栏 Agent 浏览器：快照 / 点击 / 输入 / 滚动 / 截图，页面内虚拟光标不碰真实鼠标 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control` |
-| [Chrome Bridge](https://github.com/Dax233/dsh-chrome-bridge) | 控制真实 Chrome：后台标签、DSH Agent 标签组 ACL、UIA refs、动作回执、console/network 日志、iframe 观测与点击 | `dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge` |
+| [Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control) | 侧边栏 Agent 浏览器（0.2.0）：快照 / 点击 / 输入 / 滚动 / 截图，加 QA 验收面——`viewport` 真实 CSS 视口、`emulate` 主题、`evaluate`/`metrics`/`logs`、全文与元素截图、`qa` 批量矩阵、`preview` 本地预览；页面内虚拟光标不碰真实鼠标 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control` |
+| [Chrome Bridge](https://github.com/Dax233/dsh-chrome-bridge) | 控制真实 Chrome（0.1.26）：后台标签、DSH Agent 标签组 ACL、UIA refs、动作回执、console/network 日志、iframe 观测与点击；CDP 视口/配色仿真、fullPage/clip/元素截图、networkIdle 等待 | `dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge` |
 | [Codex Bridge](https://github.com/Dax233/dsh-codex-bridge) | 桥接本机 Codex：线程清单 / 转录取读 / 无头投递任务 / goal 与活性监测（可对停滞线程补"继续"）；仓库另带离线 watch 告警脚本 | `dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge` |
-| [Delete Guard](https://github.com/Dax233/dsh-delete-guard) | 删除指令守卫：shell 命令里出现删除动词时，必须是唯一且顶层的单条语句；串联、管道、嵌套、`cmd /c`、`iex` 一律在执行前拒绝 | `dsh plugin --profile desktop add github:Dax233/dsh-delete-guard` |
+| [Delete Guard](https://github.com/Dax233/dsh-delete-guard) | 删除指令守卫（0.2.0）：shell 命令里出现删除动词时必须是唯一且顶层的单条语句；串联、管道、嵌套、`cmd /c`、`iex` 拒绝；`run_code` 内文件删除与 `node -e`/`python -c` 等解释器包装同样拦截 | `dsh plugin --profile desktop add github:Dax233/dsh-delete-guard` |
 | [Provider Aliases](https://github.com/Dax233/dsh-provider-aliases) | 模型目录别名：一个内置 provider 目录挂多条凭据路由（多 OpenCode Go 套餐等），附「模型别名」设置面板，每条路由独立 Key 与思维档位 | `dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases` |
 | [Session Bridge (fork)](https://github.com/Dax233/dsh-session-bridge) | 跨工作区会话桥 fork（上游 MIT）：按标题/工作区查找、读取任意会话，新增 `session_search_global` 全库正文检索；工具面可切换（当前开放建会话/发消息/监控/归档等写操作），bundle patch 开启持久化全文索引 | `dsh plugin --profile desktop add github:Dax233/dsh-session-bridge` |
 | [Preset Hotswitch](https://github.com/Dax233/dsh-preset-hotswitch) | 会话内热切换 Agent 预设：绕过官方「仅空白会话可切换」限制（`agentPresets.recompose` + `agent-preset/selected`），下一请求生效、重启保持 | `dsh plugin --profile desktop add github:Dax233/dsh-preset-hotswitch` |
@@ -47,6 +47,24 @@ dsh plugin --profile desktop add github:Dax233/dsh-preset-hotswitch
 
 只有 **DSH Agent 标签组** 内的标签页可以被驱动；`newTab` 会自动入组，`attach` 是显式授权（把标签页拖出组即撤销）。
 
+### 浏览器 QA（验收）能力
+
+两套浏览器插件分工明确：
+
+- **Sidebar Browser Control（0.2.0+）**：侧栏里用户可见的 QA renderer。`browser qa {url,widths,themes}`
+  一次跑 width×theme 矩阵，输出每组截图路径 + metrics 表；`viewport` 改真实 guest CSS 视口
+  （面板内等比缩放显示）、`emulate {colorScheme}` best-effort 主题、`evaluate`/`metrics`/`logs`
+  读布局/资源/console、`screenshot {fullPage,clip,ref,selector,format,path}` 出证据、
+  `setContent`/`preview` 处理自包含 HTML 与本地目录。
+- **Chrome Bridge（0.1.26+）**：真实 Chrome 标签页上的 CDP 仿真：`emulate
+  {width,height,deviceScaleFactor,mobile,colorScheme}`、`screenshot {fullPage,clip,ref,format,quality}`、
+  `wait {networkIdle}`；会临时改变该标签显示，`reset`/`detach`/关标签自动复位，不是 CI/离屏方案。
+
+**桌面壳边界（不是插件缺口）**：侧栏 webview 拿不到 CDP，所以真 DPR/媒体仿真与 HTTP 状态码不可用
+（回执如实报真实 DPR/像素尺寸）；壳只放行 http(s) 导航并取消 `file:`，所以 `file://` 不可用
+（用 `setContent` 或 `preview` 代替）；插件也没有 Electron 主进程权限，不做离屏/CI。需要真 DPR 的
+验收走 Chrome Bridge 或外部 CDP。
+
 ### Codex Bridge 说明
 
 需要本机已安装并登录 Codex（桌面版自带 CLI，或 `npm i -g @openai/codex`；登录态在 `CODEX_HOME` 下的 `auth.json`）。
@@ -59,10 +77,13 @@ dsh plugin --profile desktop add github:Dax233/dsh-preset-hotswitch
 
 插件挂在 `tools/pre-execute` 上：命令中出现删除动词（`Remove-Item`、`rm`、`del`、`rd`、
 `[IO.File]::Delete` 等）时，只有**唯一且顶层的一条语句**才放行，其余组合在调用前被拒绝并返回原因。
+0.2.0 起：`run_code` 代码文本里的文件删除 API 同样被拒绝（指引用独立 shell 删除），
+`node -e` / `python -c` / `perl -e` / `ruby -e` / `php -r` / `deno eval` / `bun -e` 这类
+「把删除藏在被求值字面量里」的包装也会被拒。
 
-- 引号内字面量先掩码，路径里的 `a;b` 不会被误判成串联；但 `iex "..."` 这类会求值的场景会回查原文。
+- 引号内字面量先掩码，路径里的 `a;b` 不会被误判成串联；但 `iex "..."`、解释器 `-c/-e` 这类会求值的场景会回查原文。
 - 分析异常时 fail-open（放行），守卫自身出问题不会把会话卡死。
-- 只管 shell 工具；`run_code` 里直接调 `fs.rmSync` 不经过 shell，不在范围内。
+- `write`/`edit` 的覆盖写不在本插件范围（属编辑语义/文件观察策略层，没有「独立语句」等价物）。
 
 ### Provider Aliases 说明
 
@@ -97,6 +118,8 @@ DSH 升级后可能失效。
 - `research/browser-control-survey.md`：同类浏览器控制方案调研。
 - `research/browser-control-backlog.md`：下载、随机配对 token、逐 frame target 等未做项。
 - `research/cross-workspace-session-access.md`：跨工作区会话访问调研、上游 fork 决策与全文索引落地记录。
+- `research/feedback-triage-2026-10-26.md`：真实使用反馈的分级（真实缺口 / 可有可无 / 不在计划内）、
+  平台事实依据与本轮各仓库迭代范围；对应的 QA 能力已落在 sidebar/chrome/delete-guard 三个仓库。
 
 ## 开发
 
