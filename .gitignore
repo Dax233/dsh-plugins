@@ -15,6 +15,10 @@ memory/
 # tools/clash-sync/run-hidden.vbs, so the directory stays where it is)
 tools/
 
+# research notes stay local: they quote device logs, session ids and local
+# paths, so they must never reach the remote
+research/
+
 # secrets and signing keys never belong in the index
 *.pem
 .env
