@@ -8,8 +8,8 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 | --- | --- | --- |
 | [Outbound Proxy](https://github.com/Dax233/dsh-outbound-proxy) | 让 DSH 出站 HTTP(S) 走本机代理（Clash / mihomo 等），端口跟随启动环境，插件行可单独覆盖 | `dsh plugin --profile desktop add github:Dax233/dsh-outbound-proxy` |
 | [Desktop Notify](https://github.com/Dax233/dsh-desktop-notify) | Windows 原生通知：任务完成 / 需要提问 / 出错时弹 toast 并播放内置 ciallo 提示音 | `dsh plugin --profile desktop add github:Dax233/dsh-desktop-notify` |
-| [Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control) | 侧边栏 Agent 浏览器（0.2.0）：快照 / 点击 / 输入 / 滚动 / 截图，加 QA 验收面——`viewport` 真实 CSS 视口、`emulate` 主题、`evaluate`/`metrics`/`logs`、全文与元素截图、`qa` 批量矩阵、`preview` 本地预览；页面内虚拟光标不碰真实鼠标 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control` |
-| [Chrome Bridge](https://github.com/Dax233/dsh-chrome-bridge) | 控制真实 Chrome（0.1.26）：后台标签、DSH Agent 标签组 ACL、UIA refs、动作回执、console/network 日志、iframe 观测与点击；CDP 视口/配色仿真、fullPage/clip/元素截图、networkIdle 等待 | `dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge` |
+| [Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control) | 侧边栏 Agent 浏览器（0.2.3）：快照 / 点击 / 输入 / 滚动 / 截图，加 QA 验收面——`viewport` 真实 CSS 视口、`emulate` 主题、`evaluate`/`metrics`/`logs`、整页/元素/clip 截图、`qa` 批量矩阵、`preview` 本地预览；页面内虚拟光标不碰真实鼠标 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control` |
+| [Chrome Bridge](https://github.com/Dax233/dsh-chrome-bridge) | 控制真实 Chrome（0.1.29）：后台标签、DSH Agent 标签组 ACL、UIA refs、动作回执、console/network 日志、iframe 观测与点击；CDP 视口/配色仿真、fullPage/clip/元素截图、networkIdle 等待、命令串行化 | `dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge` |
 | [Codex Bridge](https://github.com/Dax233/dsh-codex-bridge) | 桥接本机 Codex：线程清单 / 转录取读 / 无头投递任务 / goal 与活性监测（可对停滞线程补"继续"）；仓库另带离线 watch 告警脚本 | `dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge` |
 | [Delete Guard](https://github.com/Dax233/dsh-delete-guard) | 删除指令守卫（0.2.0）：shell 命令里出现删除动词时必须是唯一且顶层的单条语句；串联、管道、嵌套、`cmd /c`、`iex` 拒绝；`run_code` 内文件删除与 `node -e`/`python -c` 等解释器包装同样拦截 | `dsh plugin --profile desktop add github:Dax233/dsh-delete-guard` |
 | [Provider Aliases](https://github.com/Dax233/dsh-provider-aliases) | 模型目录别名：一个内置 provider 目录挂多条凭据路由（多 OpenCode Go 套餐等），附「模型别名」设置面板，每条路由独立 Key 与思维档位 | `dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases` |
@@ -51,14 +51,15 @@ dsh plugin --profile desktop add github:Dax233/dsh-preset-hotswitch
 
 两套浏览器插件分工明确：
 
-- **Sidebar Browser Control（0.2.0+）**：侧栏里用户可见的 QA renderer。`browser qa {url,widths,themes}`
+- **Sidebar Browser Control（0.2.3+）**：侧栏里用户可见的 QA renderer。`browser qa {url,widths,themes}`
   一次跑 width×theme 矩阵，输出每组截图路径 + metrics 表；`viewport` 改真实 guest CSS 视口
   （面板内等比缩放显示）、`emulate {colorScheme}` best-effort 主题、`evaluate`/`metrics`/`logs`
-  读布局/资源/console、`screenshot {fullPage,clip,ref,selector,format,path}` 出证据、
-  `setContent`/`preview` 处理自包含 HTML 与本地目录。
-- **Chrome Bridge（0.1.26+）**：真实 Chrome 标签页上的 CDP 仿真：`emulate
-  {width,height,deviceScaleFactor,mobile,colorScheme}`、`screenshot {fullPage,clip,ref,format,quality}`、
-  `wait {networkIdle}`；会临时改变该标签显示，`reset`/`detach`/关标签自动复位，不是 CI/离屏方案。
+  读布局/资源/console、`screenshot {fullPage,clip,ref,selector,format,path}` 出证据（fullPage 逐屏
+  拼接、隐藏滚动条、真实像素回执）、`setContent`/`preview` 处理自包含 HTML 与本地目录。
+- **Chrome Bridge（0.1.29+）**：真实 Chrome 标签页上的 CDP 仿真：`emulate
+  {width,height,deviceScaleFactor,mobile,colorScheme}`、`screenshot {fullPage,clip,ref,format,quality}`
+  （fullPage 临时拉高仿真视口再截，不用会挂死的 captureBeyondViewport）、`wait {networkIdle}`；
+  扩展端命令串行化；会临时改变该标签显示，`reset`/`detach`/关标签自动复位，不是 CI/离屏方案。
 
 **桌面壳边界（不是插件缺口）**：侧栏 webview 拿不到 CDP，所以真 DPR/媒体仿真与 HTTP 状态码不可用
 （回执如实报真实 DPR/像素尺寸）；壳只放行 http(s) 导航并取消 `file:`，所以 `file://` 不可用
