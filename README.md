@@ -121,13 +121,9 @@ DSH 升级后可能失效。
 
 ## 设计笔记
 
-- `research/browser-control-survey.md`：同类浏览器控制方案调研。
-- `research/browser-control-backlog.md`：下载、随机配对 token、逐 frame target 等未做项。
-- `research/cross-workspace-session-access.md`：跨工作区会话访问调研、上游 fork 决策与全文索引落地记录。
-- `research/feedback-triage-2026-10-26.md`：真实使用反馈的分级（真实缺口 / 可有可无 / 不在计划内）、
-  平台事实依据与本轮各仓库迭代范围；对应的 QA 能力已落在 sidebar/chrome/delete-guard 三个仓库。
-- `research/feedback-round2-2026-10-27.md`：第二轮（+第三轮）真机反馈分级、根因（bridge body 上限、
-  picture 真实偏好、挂载/黑面板/attach、session-bridge resume）与验证结果。
+本目录的 `research/`（同类方案调研、反馈分级、根因与真机验证记录）**只保留在本地**，不纳入
+版本控制、不推送远端：里面会引用设备诊断、会话 id 与本机路径，公开会泄露本机信息。
+仓库只发布插件索引、安装说明、平台边界与操作规范。
 
 ## DSH 平台坑（本轮实测，建议上游修）
 
