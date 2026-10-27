@@ -8,12 +8,12 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 | --- | --- | --- |
 | [Outbound Proxy](https://github.com/Dax233/dsh-outbound-proxy) | 让 DSH 出站 HTTP(S) 走本机代理（Clash / mihomo 等），端口跟随启动环境，插件行可单独覆盖 | `dsh plugin --profile desktop add github:Dax233/dsh-outbound-proxy` |
 | [Desktop Notify](https://github.com/Dax233/dsh-desktop-notify) | Windows 原生通知：任务完成 / 需要提问 / 出错时弹 toast 并播放内置 ciallo 提示音 | `dsh plugin --profile desktop add github:Dax233/dsh-desktop-notify` |
-| [Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control) | 侧边栏 Agent 浏览器（0.2.7）：快照 / 点击 / 输入 / 滚动 / 截图，加 QA 验收面——`viewport` 真实 CSS 视口（含滚动条开关/contentWidth）、`emulate` 主题（含 `<picture>`/`<link media>` DOM 兜底）、`evaluate`/`metrics`/`logs`、整页/超长元素/clip 截图、`qa` 批量矩阵、`preview` 本地预览；稳定 tab 身份 + 旧黑标签清理 + 挂载 attach 重试；页面内虚拟光标不碰真实鼠标 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control` |
+| [Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control) | 侧边栏 Agent 浏览器（0.2.9）：快照 / 点击 / 输入 / 滚动 / 截图，加 QA 验收面——`viewport` 真实 CSS 视口（含滚动条开关/contentWidth）、`emulate` 主题（含 `<picture>`/`<link media>` DOM 兜底）、`evaluate`/`metrics`/`logs`、整页/超长元素/clip 截图、`qa` 批量矩阵、`preview` 本地预览；稳定 tab + 旧黑标签清理、guest 容器迁移、attach 失败重建 webview；页面内虚拟光标不碰真实鼠标 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control` |
 | [Chrome Bridge](https://github.com/Dax233/dsh-chrome-bridge) | 控制真实 Chrome（0.1.30）：后台标签、DSH Agent 标签组 ACL、UIA refs、动作回执、console/network 日志、iframe 观测与点击；CDP 视口/配色仿真、fullPage/clip/元素截图、networkIdle best-effort（忽略长连接类型）、命令串行化 | `dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge` |
 | [Codex Bridge](https://github.com/Dax233/dsh-codex-bridge) | 桥接本机 Codex：线程清单 / 转录取读 / 无头投递任务 / goal 与活性监测（可对停滞线程补"继续"）；仓库另带离线 watch 告警脚本 | `dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge` |
 | [Delete Guard](https://github.com/Dax233/dsh-delete-guard) | 删除指令守卫（0.2.0）：shell 命令里出现删除动词时必须是唯一且顶层的单条语句；串联、管道、嵌套、`cmd /c`、`iex` 拒绝；`run_code` 内文件删除与 `node -e`/`python -c` 等解释器包装同样拦截 | `dsh plugin --profile desktop add github:Dax233/dsh-delete-guard` |
 | [Provider Aliases](https://github.com/Dax233/dsh-provider-aliases) | 模型目录别名：一个内置 provider 目录挂多条凭据路由（多 OpenCode Go 套餐等），附「模型别名」设置面板，每条路由独立 Key 与思维档位 | `dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases` |
-| [Session Bridge (fork)](https://github.com/Dax233/dsh-session-bridge) | 跨工作区会话桥 fork（上游 MIT）：按标题/工作区查找、读取任意会话，新增 `session_search_global` 全库正文检索；工具面可切换（当前开放建会话/发消息/监控/归档等写操作），bundle patch 开启持久化全文索引 | `dsh plugin --profile desktop add github:Dax233/dsh-session-bridge` |
+| [Session Bridge (fork)](https://github.com/Dax233/dsh-session-bridge) | 跨工作区会话桥 fork（上游 MIT，0.8.1）：按标题/工作区查找、读取任意会话，新增 `session_search_global` 全库正文检索；resume 会补齐模型路由（避免 `{{model}}` 装配错误，Cordis-safe）；工具面可切换（当前开放建会话/发消息/监控/归档等写操作），bundle patch 开启持久化全文索引 | `dsh plugin --profile desktop add github:Dax233/dsh-session-bridge` |
 | [Preset Hotswitch](https://github.com/Dax233/dsh-preset-hotswitch) | 会话内热切换 Agent 预设：绕过官方「仅空白会话可切换」限制（`agentPresets.recompose` + `agent-preset/selected`），下一请求生效、重启保持 | `dsh plugin --profile desktop add github:Dax233/dsh-preset-hotswitch` |
 
 ## 安装
@@ -51,7 +51,7 @@ dsh plugin --profile desktop add github:Dax233/dsh-preset-hotswitch
 
 两套浏览器插件分工明确：
 
-- **Sidebar Browser Control（0.2.7+）**：侧栏里用户可见的 QA renderer。`browser qa {url,widths,themes}`
+- **Sidebar Browser Control（0.2.9+）**：侧栏里用户可见的 QA renderer。`browser qa {url,widths,themes}`
   一次跑 width×theme 矩阵，输出每组截图路径 + metrics 表；`viewport` 改真实 guest CSS 视口
   （面板内等比缩放显示，`scrollbars:"hidden"` 可做像素级对齐并回执 contentWidth）、
   `emulate {colorScheme}` best-effort 主题（CSS 规则 + matchMedia shim + `<picture>`/`<link media>`
@@ -126,6 +126,18 @@ DSH 升级后可能失效。
 - `research/cross-workspace-session-access.md`：跨工作区会话访问调研、上游 fork 决策与全文索引落地记录。
 - `research/feedback-triage-2026-10-26.md`：真实使用反馈的分级（真实缺口 / 可有可无 / 不在计划内）、
   平台事实依据与本轮各仓库迭代范围；对应的 QA 能力已落在 sidebar/chrome/delete-guard 三个仓库。
+- `research/feedback-round2-2026-10-27.md`：第二轮（+第三轮）真机反馈分级、根因（bridge body 上限、
+  picture 真实偏好、挂载/黑面板/attach、session-bridge resume）与验证结果。
+
+## DSH 平台坑（本轮实测，建议上游修）
+
+1. **`dsh plugin add link:<path>` 不更新 `dsh.profile.bundles`**：只写 dependencies，插件静默不加载。
+   `file:` 安装会更新 bundle，`link:` 不会 → 装完必须核对 `dsh.profile.bundles`（本仓库脚本/文档已注明）。
+2. **运行中对 Host 插件 `remove`+`add` 会重复注册**：旧实例未卸载、新实例热加载 →
+   `Agent resolver 已经注册` 启动失败；需重启清状态。
+3. **运行中编辑 profile 的 `package.json` 会触发热重载**：服务图重建期间可能出现
+   `typert gateway: session/follow: active Service "sessionController" is unavailable`；需重启恢复。
+4. 结论：profile/插件安装变更一律「先改好 → 一次性重启」，运行中不 remove/add Host 插件、不编辑 profile。
 
 ## 开发
 
