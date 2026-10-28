@@ -8,7 +8,6 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 | --- | --- | --- |
 | [Outbound Proxy](https://github.com/Dax233/dsh-outbound-proxy) | 让 DSH 出站 HTTP(S) 走本机代理（Clash / mihomo 等），端口跟随启动环境，插件行可单独覆盖 | `dsh plugin --profile desktop add github:Dax233/dsh-outbound-proxy` |
 | [Desktop Notify](https://github.com/Dax233/dsh-desktop-notify) | Windows 原生通知：任务完成 / 需要提问 / 出错时弹 toast 并播放内置 ciallo 提示音 | `dsh plugin --profile desktop add github:Dax233/dsh-desktop-notify` |
-| ~~[Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control)~~ | **已停用（2026-10-28，0.2.13）**：自研「自有 webview + loopback 桥」的 Agent 浏览器，已被下面的 `dsh-agent-browser`（直接驱动内置侧栏浏览器）取代；仓库与安装保留仅用于回滚/参考，desktop profile 中 bundle 已 `enabled:false`。历史能力：快照/点击/输入/滚动/截图、viewport/emulate/metrics/logs、qa 矩阵、preview、setContent、DSH Host 隔离显式报错、失败回执与状态新鲜度字段 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control`（已停用，不建议新装） |
 | [Agent Browser](https://github.com/guanhaisen/dsh-agent-browser)（第三方，MIT） | 驱动 DSH **内置**右侧栏浏览器（用户看到的同一个 tab）：`browser_tabs/read/act/screenshot/navigate/viewport/close/eval` 8 个工具；语义 ref、viewport 预设真实重排、可见性感知截图 + 借 tab 恢复、会话作用域 tab；Desktop only，Host 半 0 import（无端口/无 token/无文件写入），`enableEval` 默认关闭。本机 DSH 0.2.1-rc.3 实测其 14 套自测全过 | `dsh plugin --profile desktop add github:guanhaisen/dsh-agent-browser` |
 | [Sidebar Control](https://github.com/Dax233/dsh-sidebar-control)（MIT） | 侧栏 Agent **控制平面**（0.2.0）：一个 `sidebar` 工具（`status` 层级树 / `open` browser·file·terminal·guide / `focus` / `close` / `expand`）+ 系统提示概览（渐进披露：概览只列 tab 与 browser URL，`expand {mode:text|elements|html}` 才拉内容与后续工具）。浏览器内容委托 `dsh-agent-browser`（expand 直接取页面文本）；file 预览走 `dsh-resource://file/session/<sid>/<path>`（相对路径按会话工作目录解析）并可回读文本片段；terminal 只负责可见打开并指向 `terminal_*`（会话身份桥接留 v0.2）；`open {kind:"browser"}` 在委托前补回 DSH Host origin 的显式隔离拒绝；0.2.0 起所有动作支持 `sessionId` 指向其他会话（status 只读；open/focus/close 会临时切到该会话执行再切回，回执注明；file 相对路径按目标会话工作目录解析；expand 文件/终端跨会话可用；浏览器内容读取与其他会话的浏览器 tabId 复用受 adopted 插件会话作用域限制，会明确说明而不是误读）。已在本机 desktop profile 真机验证（live HMR 与一次冷启动） | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-control` |
 | [Sidebar UX](https://github.com/Dax233/dsh-sidebar-ux) | 侧边栏增强（0.1.0）：右键会话/工作区行直接打开官方「…」菜单（复用宿主菜单，不复制），工作区菜单追加「在文件资源管理器中打开」（走宿主 `session.openWorkspacePath`），把会话拖进输入框插入真正的会话引用 chip（走官方 `insertReference` 通道，非裸文本） | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-ux` |
@@ -53,7 +52,7 @@ dsh plugin --profile desktop add github:Dax233/dsh-preset-hotswitch
 
 ### 浏览器能力分工
 
-三套浏览器能力，按用途选：
+两套浏览器能力，按用途选：
 
 - **Agent Browser（`dsh-agent-browser`，主用，0.1.0）**：驱动 DSH **内置**右侧栏浏览器——用户看到的
   就是 Agent 操作的同一个 tab，启动快、原生历史、keepMounted。8 个 `browser_*` 工具：
@@ -67,18 +66,14 @@ dsh plugin --profile desktop add github:Dax233/dsh-preset-hotswitch
   （fullPage 临时拉高仿真视口再截，不用会挂死的 captureBeyondViewport）、`wait {networkIdle}`
   （忽略 WebSocket/EventSource/Ping 等长连接类型，超时 best-effort 返回 ok + warning）；
   扩展端命令串行化；会临时改变该标签显示，`reset`/`detach`/关标签自动复位，不是 CI/离屏方案。
-- ~~**Sidebar Browser Control（已停用，0.2.13）**：自研 QA renderer（`browser qa` 矩阵、fullPage
-  拼接、setContent/preview、DSH Host 隔离显式报错）。~~ 已由内置浏览器驱动取代；保留代码与回滚：
-  `plugin_manager` 把 `@local/dsh-sidebar-browser-control` 的 bundle 重新 enabled 后再重启即可。
 
-**桌面壳边界（不是插件缺口）**：侧栏 webview 拿不到 CDP，所以真 DPR/媒体仿真与 HTTP 状态码不可用
-（回执如实报真实 DPR/像素尺寸）；壳只放行 http(s) 导航并取消 `file:`，所以 `file://` 不可用
-（用 `setContent` 或 `preview` 代替）；插件也没有 Electron 主进程权限，不做离屏/CI。需要真 DPR 的
-验收走 Chrome Bridge 或外部 CDP。另外壳按「loopback hostname + 当前 DSH Host 端口」整体 cancel
-guest 请求，所以侧栏浏览器打不开 DSH 自身 GUI；0.2.10 起在挂载前就返回显式隔离错误（以
-`blocked by the desktop shell's isolation policy` 开头，含 `ERR_FAILED (-2)` 与
-`setContent`/`preview`/独立 `dsh web` 替代做法），并用 `status.lastLoadFailure` 回传原始
-`did-fail-load` 原因——壳侧的 typed 原因、只读代理、按路径区分的策略仍是 DSH Desktop 上游 TODO。
+**桌面壳边界（不是插件缺口）**：内置侧栏浏览器拿不到 CDP，所以真 DPR/媒体仿真与 HTTP 状态码不可用
+（回执如实报真实 DPR/像素尺寸）；壳只放行 http(s) 导航并取消 `file:`，所以 `file://` 不可用；
+插件没有 Electron 主进程权限，不做离屏/CI。需要真 DPR/fullPage 的验收走 Chrome Bridge 或外部 CDP。
+壳按「loopback hostname + 当前 DSH Host 端口」整体 cancel guest 请求，所以内置浏览器打不开 DSH 自身
+GUI；`dsh-sidebar-control` 的 `sidebar open {kind:"browser"}` 会在委托前返回显式隔离错误（含
+`ERR_FAILED (-2)` 与 `setContent`/独立 `dsh web` 替代做法），直接用 `browser_navigate` 则仍会看到裸
+`ERR_FAILED`。壳侧的 typed 原因、只读代理、按路径区分的策略仍是 DSH Desktop 上游 TODO。
 
 ### Codex Bridge 说明
 
