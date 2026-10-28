@@ -8,7 +8,8 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 | --- | --- | --- |
 | [Outbound Proxy](https://github.com/Dax233/dsh-outbound-proxy) | 让 DSH 出站 HTTP(S) 走本机代理（Clash / mihomo 等），端口跟随启动环境，插件行可单独覆盖 | `dsh plugin --profile desktop add github:Dax233/dsh-outbound-proxy` |
 | [Desktop Notify](https://github.com/Dax233/dsh-desktop-notify) | Windows 原生通知：任务完成 / 需要提问 / 出错时弹 toast 并播放内置 ciallo 提示音 | `dsh plugin --profile desktop add github:Dax233/dsh-desktop-notify` |
-| [Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control) | 侧边栏 Agent 浏览器（0.2.13）：快照 / 点击 / 输入 / 滚动 / 截图，加 QA 验收面——`viewport` 真实 CSS 视口（含滚动条开关/contentWidth）、`emulate` 主题（含 `<picture>`/`<link media>` DOM 兜底）、`evaluate`/`metrics`/`logs`、整页/超长元素/clip 截图、`qa` 批量矩阵、`preview` 本地预览；稳定 tab + 旧黑标签清理、guest 容器迁移、attach 失败重建 webview；页面内虚拟光标不碰真实鼠标；0.2.10 起 `open`/`navigate` 命中 DSH Host 自身 origin 时在挂载前返回显式桌面壳隔离错误，`status` 回传 `lastLoadFailure`；0.2.11 起失败回执结构化（`{ok:false}` + `attemptedUrl` + 规范化错误码如 `ERR_CONNECTION_REFUSED (-102)` + `loadFailure`，落到错误页时另报 `loaded:false`，不再暴露 Electron IPC 包装文本），`status` 增加 `attemptedUrl`/`hostOrigin` 预判字段；0.2.12 修复 `setContent` 在桌面壳里等待 `about:blank` 导航导致的卡死（桌面改为原地渲染 + 有界等待 + 页面探测兜底），并给 bridge 命令循环加看门狗（挂死命令返回超时回执、轮询继续，不再需要手动重开面板）；0.2.13 起 `status` 增加 `lastLoadedAt`/`contentSource`/`lastLoadFailureStale` 新鲜度字段（区分成功导航与 setContent、标记过期失败），`preview` 在无 `file` 且目录无 `index.html` 时回执 no-index 警告 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control` |
+| ~~[Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control)~~ | **已停用（2026-10-28，0.2.13）**：自研「自有 webview + loopback 桥」的 Agent 浏览器，已被下面的 `dsh-agent-browser`（直接驱动内置侧栏浏览器）取代；仓库与安装保留仅用于回滚/参考，desktop profile 中 bundle 已 `enabled:false`。历史能力：快照/点击/输入/滚动/截图、viewport/emulate/metrics/logs、qa 矩阵、preview、setContent、DSH Host 隔离显式报错、失败回执与状态新鲜度字段 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control`（已停用，不建议新装） |
+| [Agent Browser](https://github.com/guanhaisen/dsh-agent-browser)（第三方，MIT） | 驱动 DSH **内置**右侧栏浏览器（用户看到的同一个 tab）：`browser_tabs/read/act/screenshot/navigate/viewport/close/eval` 8 个工具；语义 ref、viewport 预设真实重排、可见性感知截图 + 借 tab 恢复、会话作用域 tab；Desktop only，Host 半 0 import（无端口/无 token/无文件写入），`enableEval` 默认关闭。本机 DSH 0.2.1-rc.3 实测其 14 套自测全过 | `dsh plugin --profile desktop add github:guanhaisen/dsh-agent-browser` |
 | [Sidebar UX](https://github.com/Dax233/dsh-sidebar-ux) | 侧边栏增强（0.1.0）：右键会话/工作区行直接打开官方「…」菜单（复用宿主菜单，不复制），工作区菜单追加「在文件资源管理器中打开」（走宿主 `session.openWorkspacePath`），把会话拖进输入框插入真正的会话引用 chip（走官方 `insertReference` 通道，非裸文本） | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-ux` |
 | [Chrome Bridge](https://github.com/Dax233/dsh-chrome-bridge) | 控制真实 Chrome（0.1.30）：后台标签、DSH Agent 标签组 ACL、UIA refs、动作回执、console/network 日志、iframe 观测与点击；CDP 视口/配色仿真、fullPage/clip/元素截图、networkIdle best-effort（忽略长连接类型）、命令串行化 | `dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge` |
 | [Codex Bridge](https://github.com/Dax233/dsh-codex-bridge) | 桥接本机 Codex：线程清单 / 转录取读 / 无头投递任务 / goal 与活性监测（可对停滞线程补"继续"）；仓库另带离线 watch 告警脚本 | `dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge` |
@@ -49,24 +50,25 @@ dsh plugin --profile desktop add github:Dax233/dsh-preset-hotswitch
 
 只有 **DSH Agent 标签组** 内的标签页可以被驱动；`newTab` 会自动入组，`attach` 是显式授权（把标签页拖出组即撤销）。
 
-### 浏览器 QA（验收）能力
+### 浏览器能力分工
 
-两套浏览器插件分工明确：
+三套浏览器能力，按用途选：
 
-- **Sidebar Browser Control（0.2.10+）**：侧栏里用户可见的 QA renderer。`browser qa {url,widths,themes}`
-  一次跑 width×theme 矩阵，输出每组截图路径 + metrics 表；`viewport` 改真实 guest CSS 视口
-  （面板内等比缩放显示，`scrollbars:"hidden"` 可做像素级对齐并回执 contentWidth）、
-  `emulate {colorScheme}` best-effort 主题（CSS 规则 + matchMedia shim + `<picture>`/`<link media>`
-  DOM 兜底，含 open shadowRoot）、`evaluate`/`metrics`/`logs` 读布局/资源/console、
-  `screenshot {fullPage,clip,ref,selector,format,path}` 出证据（fullPage 逐屏拼接、隐藏滚动条、
-  阶段诊断与 timings、超长元素整幅拼接、真实像素回执）、`setContent`/`preview` 处理自包含 HTML 与本地目录。
-  面板 tab 身份稳定（重载复用同一个 tab，启动清理旧版本残留的黑标签），guest attach 带 3 次
-  re-append 重试 + 最后「关掉重开 tab」兜底。
+- **Agent Browser（`dsh-agent-browser`，主用，0.1.0）**：驱动 DSH **内置**右侧栏浏览器——用户看到的
+  就是 Agent 操作的同一个 tab，启动快、原生历史、keepMounted。8 个 `browser_*` 工具：
+  `browser_tabs`（含 mounted/loading/failed/unverified/carrier）、`browser_read`（text/elements/html，
+  elements 带稳定 ref）、`browser_act`（click/type/press/scroll/select/reload/wait，wait 支持
+  visible/attached/hidden 与 ignoreCache reload）、`browser_screenshot`（视口截图 + 预设尺寸）、
+  `browser_navigate`、`browser_viewport`（auto/phone/tablet/desktop/custom，真实重排 + 缩放显示）、
+  `browser_close`、`browser_eval`（默认因 `enableEval:false` 拒绝）。Desktop only，Host 半无 import。
 - **Chrome Bridge（0.1.30+）**：真实 Chrome 标签页上的 CDP 仿真：`emulate
   {width,height,deviceScaleFactor,mobile,colorScheme}`、`screenshot {fullPage,clip,ref,format,quality}`
   （fullPage 临时拉高仿真视口再截，不用会挂死的 captureBeyondViewport）、`wait {networkIdle}`
   （忽略 WebSocket/EventSource/Ping 等长连接类型，超时 best-effort 返回 ok + warning）；
   扩展端命令串行化；会临时改变该标签显示，`reset`/`detach`/关标签自动复位，不是 CI/离屏方案。
+- ~~**Sidebar Browser Control（已停用，0.2.13）**：自研 QA renderer（`browser qa` 矩阵、fullPage
+  拼接、setContent/preview、DSH Host 隔离显式报错）。~~ 已由内置浏览器驱动取代；保留代码与回滚：
+  `plugin_manager` 把 `@local/dsh-sidebar-browser-control` 的 bundle 重新 enabled 后再重启即可。
 
 **桌面壳边界（不是插件缺口）**：侧栏 webview 拿不到 CDP，所以真 DPR/媒体仿真与 HTTP 状态码不可用
 （回执如实报真实 DPR/像素尺寸）；壳只放行 http(s) 导航并取消 `file:`，所以 `file://` 不可用
