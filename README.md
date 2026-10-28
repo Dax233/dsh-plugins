@@ -9,6 +9,7 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 | [Outbound Proxy](https://github.com/Dax233/dsh-outbound-proxy) | 让 DSH 出站 HTTP(S) 走本机代理（Clash / mihomo 等），端口跟随启动环境，插件行可单独覆盖 | `dsh plugin --profile desktop add github:Dax233/dsh-outbound-proxy` |
 | [Desktop Notify](https://github.com/Dax233/dsh-desktop-notify) | Windows 原生通知：任务完成 / 需要提问 / 出错时弹 toast 并播放内置 ciallo 提示音 | `dsh plugin --profile desktop add github:Dax233/dsh-desktop-notify` |
 | [Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control) | 侧边栏 Agent 浏览器（0.2.9）：快照 / 点击 / 输入 / 滚动 / 截图，加 QA 验收面——`viewport` 真实 CSS 视口（含滚动条开关/contentWidth）、`emulate` 主题（含 `<picture>`/`<link media>` DOM 兜底）、`evaluate`/`metrics`/`logs`、整页/超长元素/clip 截图、`qa` 批量矩阵、`preview` 本地预览；稳定 tab + 旧黑标签清理、guest 容器迁移、attach 失败重建 webview；页面内虚拟光标不碰真实鼠标 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control` |
+| [Sidebar UX](https://github.com/Dax233/dsh-sidebar-ux) | 侧边栏增强（0.1.0）：右键会话/工作区行直接打开官方「…」菜单（复用宿主菜单，不复制），工作区菜单追加「在文件资源管理器中打开」（走宿主 `session.openWorkspacePath`），把会话拖进输入框插入真正的会话引用 chip（走官方 `insertReference` 通道，非裸文本） | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-ux` |
 | [Chrome Bridge](https://github.com/Dax233/dsh-chrome-bridge) | 控制真实 Chrome（0.1.30）：后台标签、DSH Agent 标签组 ACL、UIA refs、动作回执、console/network 日志、iframe 观测与点击；CDP 视口/配色仿真、fullPage/clip/元素截图、networkIdle best-effort（忽略长连接类型）、命令串行化 | `dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge` |
 | [Codex Bridge](https://github.com/Dax233/dsh-codex-bridge) | 桥接本机 Codex：线程清单 / 转录取读 / 无头投递任务 / goal 与活性监测（可对停滞线程补"继续"）；仓库另带离线 watch 告警脚本 | `dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge` |
 | [Delete Guard](https://github.com/Dax233/dsh-delete-guard) | 删除指令守卫（0.2.0）：shell 命令里出现删除动词时必须是唯一且顶层的单条语句；串联、管道、嵌套、`cmd /c`、`iex` 拒绝；`run_code` 内文件删除与 `node -e`/`python -c` 等解释器包装同样拦截 | `dsh plugin --profile desktop add github:Dax233/dsh-delete-guard` |
@@ -24,6 +25,7 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 dsh plugin --profile desktop add github:Dax233/dsh-outbound-proxy
 dsh plugin --profile desktop add github:Dax233/dsh-desktop-notify
 dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control
+dsh plugin --profile desktop add github:Dax233/dsh-sidebar-ux
 dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge
 dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge
 dsh plugin --profile desktop add github:Dax233/dsh-provider-aliases
