@@ -25,7 +25,8 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 ```sh
 dsh plugin --profile desktop add github:Dax233/dsh-outbound-proxy
 dsh plugin --profile desktop add github:Dax233/dsh-desktop-notify
-dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control
+dsh plugin --profile desktop add github:guanhaisen/dsh-agent-browser
+dsh plugin --profile desktop add github:Dax233/dsh-sidebar-control
 dsh plugin --profile desktop add github:Dax233/dsh-sidebar-ux
 dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge
 dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge
