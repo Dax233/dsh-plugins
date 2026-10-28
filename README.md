@@ -8,7 +8,7 @@ DeepSeek Harness（DSH）插件目录。每个插件维护在独立仓库中；�
 | --- | --- | --- |
 | [Outbound Proxy](https://github.com/Dax233/dsh-outbound-proxy) | 让 DSH 出站 HTTP(S) 走本机代理（Clash / mihomo 等），端口跟随启动环境，插件行可单独覆盖 | `dsh plugin --profile desktop add github:Dax233/dsh-outbound-proxy` |
 | [Desktop Notify](https://github.com/Dax233/dsh-desktop-notify) | Windows 原生通知：任务完成 / 需要提问 / 出错时弹 toast 并播放内置 ciallo 提示音 | `dsh plugin --profile desktop add github:Dax233/dsh-desktop-notify` |
-| [Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control) | 侧边栏 Agent 浏览器（0.2.9）：快照 / 点击 / 输入 / 滚动 / 截图，加 QA 验收面——`viewport` 真实 CSS 视口（含滚动条开关/contentWidth）、`emulate` 主题（含 `<picture>`/`<link media>` DOM 兜底）、`evaluate`/`metrics`/`logs`、整页/超长元素/clip 截图、`qa` 批量矩阵、`preview` 本地预览；稳定 tab + 旧黑标签清理、guest 容器迁移、attach 失败重建 webview；页面内虚拟光标不碰真实鼠标 | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control` |
+| [Sidebar Browser Control](https://github.com/Dax233/dsh-sidebar-browser-control) | 侧边栏 Agent 浏览器（0.2.10）：快照 / 点击 / 输入 / 滚动 / 截图，加 QA 验收面——`viewport` 真实 CSS 视口（含滚动条开关/contentWidth）、`emulate` 主题（含 `<picture>`/`<link media>` DOM 兜底）、`evaluate`/`metrics`/`logs`、整页/超长元素/clip 截图、`qa` 批量矩阵、`preview` 本地预览；稳定 tab + 旧黑标签清理、guest 容器迁移、attach 失败重建 webview；页面内虚拟光标不碰真实鼠标；0.2.10 起 `open`/`navigate` 命中 DSH Host 自身 origin 时在挂载前返回显式桌面壳隔离错误，`status` 回传 `lastLoadFailure` | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-browser-control` |
 | [Sidebar UX](https://github.com/Dax233/dsh-sidebar-ux) | 侧边栏增强（0.1.0）：右键会话/工作区行直接打开官方「…」菜单（复用宿主菜单，不复制），工作区菜单追加「在文件资源管理器中打开」（走宿主 `session.openWorkspacePath`），把会话拖进输入框插入真正的会话引用 chip（走官方 `insertReference` 通道，非裸文本） | `dsh plugin --profile desktop add github:Dax233/dsh-sidebar-ux` |
 | [Chrome Bridge](https://github.com/Dax233/dsh-chrome-bridge) | 控制真实 Chrome（0.1.30）：后台标签、DSH Agent 标签组 ACL、UIA refs、动作回执、console/network 日志、iframe 观测与点击；CDP 视口/配色仿真、fullPage/clip/元素截图、networkIdle best-effort（忽略长连接类型）、命令串行化 | `dsh plugin --profile desktop add github:Dax233/dsh-chrome-bridge` |
 | [Codex Bridge](https://github.com/Dax233/dsh-codex-bridge) | 桥接本机 Codex：线程清单 / 转录取读 / 无头投递任务 / goal 与活性监测（可对停滞线程补"继续"）；仓库另带离线 watch 告警脚本 | `dsh plugin --profile desktop add github:Dax233/dsh-codex-bridge` |
@@ -53,7 +53,7 @@ dsh plugin --profile desktop add github:Dax233/dsh-preset-hotswitch
 
 两套浏览器插件分工明确：
 
-- **Sidebar Browser Control（0.2.9+）**：侧栏里用户可见的 QA renderer。`browser qa {url,widths,themes}`
+- **Sidebar Browser Control（0.2.10+）**：侧栏里用户可见的 QA renderer。`browser qa {url,widths,themes}`
   一次跑 width×theme 矩阵，输出每组截图路径 + metrics 表；`viewport` 改真实 guest CSS 视口
   （面板内等比缩放显示，`scrollbars:"hidden"` 可做像素级对齐并回执 contentWidth）、
   `emulate {colorScheme}` best-effort 主题（CSS 规则 + matchMedia shim + `<picture>`/`<link media>`
@@ -71,7 +71,11 @@ dsh plugin --profile desktop add github:Dax233/dsh-preset-hotswitch
 **桌面壳边界（不是插件缺口）**：侧栏 webview 拿不到 CDP，所以真 DPR/媒体仿真与 HTTP 状态码不可用
 （回执如实报真实 DPR/像素尺寸）；壳只放行 http(s) 导航并取消 `file:`，所以 `file://` 不可用
 （用 `setContent` 或 `preview` 代替）；插件也没有 Electron 主进程权限，不做离屏/CI。需要真 DPR 的
-验收走 Chrome Bridge 或外部 CDP。
+验收走 Chrome Bridge 或外部 CDP。另外壳按「loopback hostname + 当前 DSH Host 端口」整体 cancel
+guest 请求，所以侧栏浏览器打不开 DSH 自身 GUI；0.2.10 起在挂载前就返回显式隔离错误（以
+`blocked by the desktop shell's isolation policy` 开头，含 `ERR_FAILED (-2)` 与
+`setContent`/`preview`/独立 `dsh web` 替代做法），并用 `status.lastLoadFailure` 回传原始
+`did-fail-load` 原因——壳侧的 typed 原因、只读代理、按路径区分的策略仍是 DSH Desktop 上游 TODO。
 
 ### Codex Bridge 说明
 
