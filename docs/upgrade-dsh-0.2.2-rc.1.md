@@ -124,7 +124,24 @@ A 略过；B 照做；C.1 可选。到此即可正常使用。
 
 ---
 
-## 7. 证据索引（主设备验证记录，可对照）
+## 7. 增量：0.2.2-rc.1 → 0.2.2-rc.3（2026-11-16 主设备实测）
+
+> 主设备已从 rc.1 升到 rc.3。rc.3 相对 rc.2 只是加实验「DeepSeek 会话导入」+ 修 Windows 应用内更新失败；主要变更都在 rc.2（1574 commits），但**无已装插件的硬 BREAK**。若另一台设备还在 0.2.1-rc.5，直接按本文档升级到 0.2.2 **rc.3** 即可，把 §3-A/B 替换为下面 1–3 步。
+
+1. **provider-aliases**：升级后立即 `node tools/sync.mjs`（rc.3 上游 `dsh-llm-pi-ai` = 137,008B；本仓库 commit `1121608` 已含 rc.3 版）→ 重启 DSH。
+2. **session-bridge**：需 **≥0.9.1**（rc.2 移除 `AgentRegistry.roots()/isOwnedBy()`，旧版 monitor 的子代理守卫会静默失效）；`4eed244` 已推送，link: 安装重启即生效。
+3. **第三方插件（rc.3 之后经插件页升级）**：`dsh-computer-use-win 0.6.0`、`dsh-edit-turn 0.6.2`、`dsh-rerun-turn 0.3.0`。
+4. **profile 自动迁移**：`@deepseek-ai/dsh-experimental-agent-team-profile` 已被 rc.3 列入 RETIRED（启动时自动从 bundles 移除，Team 改由 base 内置 `agent-team` 行提供）；web search 默认切 `deepseek-search-api`（无自定义配置时自动，可在设置页改回旧版）；`fs-observation-policy` 覆盖继续生效。
+5. **可选**：内置 preset 默认关闭 `interrupt_agent`，如需要请在 profile 覆盖对应 preset 的 `interrupt: true`；`create_worktree` 相关归档清理行为见 rc.2 指南 `archive-worktrees`。
+6. **回滚注意**：rc.2+ 的 subagent catalog 是 **v3**，升级后创建过子代理的会话旧版 DSH 打不开；回滚前需把 rc.1 安装包从 updater 缓存复制出来（缓存会被新版本覆盖），其余（session 格式 v4、schedule v2）rc.1↔rc.3 双向兼容。
+
+---
+
+## 8. 证据索引（主设备验证记录，可对照）
+
+- `research/dsh-022rc3-delta-2026-11-16.md`（rc.1→rc.3 契约 delta，46 条官方指南逐条摘要）
+- `research/playbook-022rc3-2026-11-16.md`、`thirdparty-rc3-map-2026-11-16.md`、`session-bridge-022rc3-compat-2026-11-16.md`
+- GitHub：`dsh-provider-aliases@1121608`（rc.3 适配器）、`dsh-session-bridge@4eed244`（0.9.1）
 
 - `research/dsh-022-delta-2026-11-06.md`（rc.5→0.2.2 全量契约 delta，npm 316 包逐文件 sha256）
 - `research/plugin-install-audit-2026-10-30.md` / `dsh-rc5-plugin-audit-2026-10-30.md`（升级前基线审计）
